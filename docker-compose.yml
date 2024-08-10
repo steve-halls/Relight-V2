@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  comfyui-ollama:
+    build: .
+    ports:
+      - "8000:8000"  # ComfyUI application port
+      - "11434:11434"  # Ollama server port
+    volumes:
+      - ollama:/root/.ollama  # Persistent storage for Ollama models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  ollama:
