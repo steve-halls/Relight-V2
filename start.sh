@@ -10,7 +10,7 @@ sleep 10
 ollama pull llava
 
 # Start the ComfyUI application
-python3 main.py --listen 0.0.0.0
+python3 main.py
 
 # Keep the container running
 tail -f /dev/null
