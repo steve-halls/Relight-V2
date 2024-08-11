@@ -29,7 +29,7 @@ app = FastAPI()
 
 # Configure Cloudinary
 cloudinary.config( 
-    cloud_name='dyzismqqu',
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
     api_key=os.getenv('CLOUDINARY_API_KEY'),
     api_secret=os.getenv('CLOUDINARY_API_SECRET'),
 )
@@ -197,18 +197,18 @@ def save_to_cloudinary(image_data, node_id):
     return image_url
 
 # #--- Uncomment when running main.py locally
-def start_comfyui():
-    print("Starting ComfyUI...")
-    # Start ComfyUI in the background
-    subprocess.Popen(["start", "", "ComfyUI_windows_portable\\start_comfyui.bat"], shell=True)
+#def start_comfyui():
+#    print("Starting ComfyUI...")
+#    # Start ComfyUI in the background
+#    subprocess.Popen(["start", "", "ComfyUI_windows_portable\\start_comfyui.bat"], shell=True)
 
 
 #--- Uncomment when building on Docker
-# def start_comfyui():
-#     print("Starting ComfyUI...")
-#     # Use the embedded Python environment
-#     subprocess.Popen(["python", "-s", "/ComfyUI/ComfyUI/main.py"], shell=False)
-#     print("Waiting for ComfyUI to initialize...")
+def start_comfyui():
+    print("Starting ComfyUI...")
+    # Use the embedded Python environment
+    subprocess.Popen(["python", "-s", "ComfyUI/main.py"], shell=False)
+    print("Waiting for ComfyUI to initialize...")
 
 
 def wait_for_comfyui(max_retries=30, delay=10):
@@ -283,18 +283,23 @@ async def generate_image(request: ImageRequest):
     raise HTTPException(status_code=500, detail="Failed to generate and upload image")
 
 
-if __name__ == "__main__":
-    if  is_ollama_running():
-        if  start_ollama():
+def main():
+    if not is_ollama_running():
+        if start_ollama():
             print("Ollama started successfully!")
+        else:
+            print("Failed to start Ollama. Exiting.")
             exit(1)
-    
+
     # Code to start ComfyUI
     start_comfyui()
 
     if not wait_for_comfyui():
         print("ComfyUI did not start in time. Exiting.")
         exit(1)
-    
+
     # Start FastAPI
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    main()

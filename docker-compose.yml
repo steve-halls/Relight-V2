@@ -5,9 +5,14 @@ services:
     build: .
     ports:
       - "8000:8000"  # ComfyUI application port
+      - "8188:8188"  # ComfyUI Server port
       - "11434:11434"  # Ollama server port
     volumes:
       - ollama:/root/.ollama  # Persistent storage for Ollama models
+    environment:
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_KEY}
     deploy:
       resources:
         reservations:
